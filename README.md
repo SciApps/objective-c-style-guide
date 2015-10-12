@@ -141,23 +141,12 @@ else {
 
 * There should be exactly one blank line between methods to aid in visual clarity and organization. Whitespace within methods should separate functionality, but often there should probably be new methods.
 * Prefer using auto-synthesis. But if necessary, `@synthesize` and `@dynamic` should each be declared on new lines in the implementation.
-* Colon-aligning method invocation should often be avoided.  There are cases where a method signature may have >= 3 colons and colon-aligning makes the code more readable. Please do **NOT** however colon align methods containing blocks because Xcode's indenting makes it illegible.
+* Colon-aligning method invocation should often be used, and is a must if the >= 3 parameters. Please do  colon align methods containing blocks as Xcode's does.
 
 **Preferred:**
 
 ```objc
-// blocks are easily readable
-[UIView animateWithDuration:1.0 animations:^{
-  // something
-} completion:^(BOOL finished) {
-  // something
-}];
-```
-
-**Not Preferred:**
-
-```objc
-// colon-aligning makes the block indentation hard to read
+// colon-aligning makes the block indentation easy to read
 [UIView animateWithDuration:1.0
                  animations:^{
                      // something
@@ -166,6 +155,17 @@ else {
                      // something
                  }];
 ```
+
+**Not Preferred:**
+
+```objc
+[UIView animateWithDuration:1.0 animations:^{
+  // something
+} completion:^(BOOL finished) {
+  // something
+}];
+```
+
 
 ## Comments
 
@@ -191,14 +191,14 @@ UIButton *settingsButton;
 UIButton *setBut;
 ```
 
-A three letter prefix should always be used for class names and constants, however may be omitted for Core Data entity names. For any official raywenderlich.com books, starter kits, or tutorials, the prefix 'RWT' should be used.
+A three letter prefix should always be used for class names and constants, however may be omitted for Core Data entity names. For any official raywenderlich.com books, starter kits, or tutorials, the prefix 'CSA' should be used.
 
 Constants should be camel-case with all words capitalized and prefixed by the related class name for clarity.
 
 **Preferred:**
 
 ```objc
-static NSTimeInterval const RWTTutorialViewControllerNavigationFadeAnimationDuration = 0.3;
+static NSTimeInterval const CSATutorialViewControllerNavigationFadeAnimationDuration = 0.3;
 ```
 
 **Not Preferred:**
@@ -266,7 +266,7 @@ Direct access to instance variables that 'back' properties should be avoided exc
 **Preferred:**
 
 ```objc
-@interface RWTTutorial : NSObject
+@interface CSATutorial : NSObject
 
 @property (strong, nonatomic) NSString *tutorialName;
 
@@ -276,7 +276,7 @@ Direct access to instance variables that 'back' properties should be avoided exc
 **Not Preferred:**
 
 ```objc
-@interface RWTTutorial : NSObject {
+@interface CSATutorial : NSObject {
   NSString *tutorialName;
 }
 ```
@@ -359,14 +359,14 @@ NSNumber *buildingStreetNumber = [NSNumber numberWithInteger:10018];
 
 ## Constants
 
-Constants are preferred over in-line string literals or numbers, as they allow for easy reproduction of commonly used variables and can be quickly changed without the need for find and replace. Constants should be declared as `static` constants and not `#define`s unless explicitly being used as a macro.
+Constants are preferred over in-line string literals or numbers, as they allow for easy reproduction of commonly used variables and can be quickly changed without the need for find and replace. Constant names should start with a lower case k, as apple docs say. Constants should be declared as `static` constants and not `#define`s unless explicitly being used as a macro.
 
 **Preferred:**
 
 ```objc
-static NSString * const RWTAboutViewControllerCompanyName = @"RayWenderlich.com";
+static NSString * const kCSAAboutViewControllerCompanyName = @"RayWenderlich.com";
 
-static CGFloat const RWTImageThumbnailHeight = 50.0;
+static CGFloat const kCSAImageThumbnailHeight = 50.0;
 ```
 
 **Not Preferred:**
@@ -377,64 +377,71 @@ static CGFloat const RWTImageThumbnailHeight = 50.0;
 #define thumbnailHeight 2
 ```
 
+## Application wide constants
+
+When using application wide constants, one should create a somewhat Constatns.h file and a .m pair for it, so to hide the actual value of the delcared constant into it.
+
+**Preferred:**
+
+.h file:
+```objc
+FOUNDATION_EXPORT NSString * kBaseUrlStr;
+```
+.m file:
+```objc
+NSString * kBaseUrlStr = @"codingsans.com";
+```
+
 ## Enumerated Types
 
-When using `enum`s, it is recommended to use the new fixed underlying type specification because it has stronger type checking and code completion. The SDK now includes a macro to facilitate and encourage use of fixed underlying types: `NS_ENUM()`
+When using `enum`s, it is recommended to use the new fixed underlying type specification because it has stronger type checking and code completion. The SDK now includes a macro to facilitate and encourage use of fixed underlying types: `NS_ENUM()`. All enum value names should start with the name of the enum itself. CSALeftMenuTopItem -> CSALeftMenuTopItemFirstValue. This is important for swift compatibility.
 
 **For Example:**
 
 ```objc
-typedef NS_ENUM(NSInteger, RWTLeftMenuTopItemType) {
-  RWTLeftMenuTopItemMain,
-  RWTLeftMenuTopItemShows,
-  RWTLeftMenuTopItemSchedule
+typedef NS_ENUM(NSInteger, CSALeftMenuTopItem) {
+  CSALeftMenuTopItemMain,
+  CSALeftMenuTopItemShows,
+  CSALeftMenuTopItemSchedule
 };
 ```
 
 You can also make explicit value assignments (showing older k-style constant definition):
 
 ```objc
-typedef NS_ENUM(NSInteger, RWTGlobalConstants) {
-  RWTPinSizeMin = 1,
-  RWTPinSizeMax = 5,
-  RWTPinCountMin = 100,
-  RWTPinCountMax = 500,
+typedef NS_ENUM(NSInteger, CSAGlobalConstants) {
+  CSAGlobalConstantsPinSizeMin = 1,
+  CSAGlobalConstantsPinSizeMax = 5,
+  CSAGlobalConstantsPinCountMin = 100,
+  CSAGlobalConstantsPinCountMax = 500,
 };
 ```
 
-Older k-style constant definitions should be **avoided** unless writing CoreFoundation C code (unlikely).
-
-**Not Preferred:**
-
-```objc
-enum GlobalConstants {
-  kMaxPinSize = 5,
-  kMaxPinCount = 500,
-};
-```
 
 
 ## Case Statements
 
-Braces are not required for case statements, unless enforced by the complier.  
-When a case contains more than one line, braces should be added.
+Braces are required for case statements.
 
 ```objc
 switch (condition) {
-  case 1:
+  case 1: {
     // ...
     break;
+  }
   case 2: {
     // ...
     // Multi-line example using braces
     break;
   }
-  case 3:
+  case 3: {
     // ...
     break;
-  default: 
+  }
+  default: {
     // ...
     break;
+  {
 }
 
 ```
@@ -443,11 +450,24 @@ There are times when the same code can be used for multiple cases, and a fall-th
 
 ```objc
 switch (condition) {
-  case 1:
+  case 1: {
+    //some code
     // ** fall-through! **
-  case 2:
+  }
+  case 2: {
+    // some other code
     // code executed for values 1 and 2
     break;
+  }
+  case 3: {
+    // decalration1
+    // some code
+    // ** fall-through! **
+  case 4:
+    // using declariation1 var
+    break;
+  }
+  
   default: 
     // ...
     break;
@@ -458,30 +478,33 @@ switch (condition) {
 When using an enumerated type for a switch, 'default' is not needed.   For example:
 
 ```objc
-RWTLeftMenuTopItemType menuType = RWTLeftMenuTopItemMain;
+CSALeftMenuTopItem menuType = CSALeftMenuTopItemMain;
 
 switch (menuType) {
-  case RWTLeftMenuTopItemMain:
+  case CSALeftMenuTopItemMain: {
     // ...
     break;
-  case RWTLeftMenuTopItemShows:
+  }
+  case CSALeftMenuTopItemShows: {
     // ...
     break;
-  case RWTLeftMenuTopItemSchedule:
+  }
+  case CSALeftMenuTopItemSchedule: {
     // ...
     break;
+  }
 }
 ```
 
 
 ## Private Properties
 
-Private properties should be declared in class extensions (anonymous categories) in the implementation file of a class. Named categories (such as `RWTPrivate` or `private`) should never be used unless extending another class.   The Anonymous category can be shared/exposed for testing using the <headerfile>+Private.h file naming convention.
+Private properties should be declared in class extensions (anonymous categories) in the implementation file of a class. Named categories (such as `CSAPrivate` or `private`) should never be used unless extending another class.   The Anonymous category can be shared/exposed for testing using the <headerfile>+Private.h file naming convention.
 
 **For Example:**
 
 ```objc
-@interface RWTDetailViewController ()
+@interface CSADetailViewController ()
 
 @property (strong, nonatomic) GADBannerView *googleAdView;
 @property (strong, nonatomic) ADBannerView *iAdView;
@@ -492,22 +515,25 @@ Private properties should be declared in class extensions (anonymous categories)
 
 ## Booleans
 
-Objective-C uses `YES` and `NO`.  Therefore `true` and `false` should only be used for CoreFoundation, C or C++ code.  Since `nil` resolves to `NO` it is unnecessary to compare it in conditions. Never compare something directly to `YES`, because `YES` is defined to 1 and a `BOOL` can be up to 8 bits.
+Objective-C uses `YES` and `NO`.  Therefore `true` and `false` should only be used for CoreFoundation, C or C++ code.  Since `nil` resolves to `NO` it is unnecessary to compare it in conditions. Never compare something directly to `YES`, because `YES` is defined to 1 and a `BOOL` can be up to 8 bits. Altough it's ain't nice to store value in a boolean other then `1` or `0`.
 
 This allows for more consistency across files and greater visual clarity.
 
 **Preferred:**
 
 ```objc
-if (someObject) {}
-if (![anotherObject boolValue]) {}
+if (someObject) {} or if (someObject != nil) {}
+if (someObject == nil) {}
+
+if ([anotherObject boolValue] == NO) {}
+
 ```
 
 **Not Preferred:**
 
 ```objc
-if (someObject == nil) {}
-if ([anotherObject boolValue] == NO) {}
+if (!someObject) {}
+if (![anotherObject boolValue]) {}
 if (isAwesome == YES) {} // Never do this.
 if (isAwesome == true) {} // Never do this.
 ```
@@ -525,7 +551,7 @@ Conditional bodies should always use braces even when a conditional body could b
 
 **Preferred:**
 ```objc
-if (!error) {
+if (error == nil) {
   return success;
 }
 ```
@@ -584,7 +610,7 @@ Where class constructor methods are used, these should always return type of 'in
 
 ```objc
 @interface Airplane
-+ (instancetype)airplaneWithType:(RWTAirplaneType)type;
++ (instancetype)airplaneWithType:(CSAAirplaneType)type;
 @end
 ```
 
@@ -628,8 +654,11 @@ When coding with conditionals, the left hand margin of the code should be the "g
 
 ```objc
 - (void)someMethod {
-  if (![someOther boolValue]) {
+  if ([someOther boolValue] == NO) {
 	return;
+  }
+  if (//check if somthing is missing) {
+  	return
   }
 
   //Do something important
@@ -653,7 +682,8 @@ When methods return an error parameter by reference, switch on the returned valu
 **Preferred:**
 ```objc
 NSError *error;
-if (![self trySomethingWithError:&error]) {
+BOOL succ = [self trySomethingWithError:&error];
+if (succ == NO) {
   // Handle Error
 }
 ```
