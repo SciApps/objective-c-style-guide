@@ -10,7 +10,7 @@ This style guide contains suggestions proper code formatting, company convention
 
 ## Credits
 
-Creator and maintener: [Oliver Kocsis](https://github.com/okocsis)
+Creator and maintainer: [Oliver Kocsis](https://github.com/okocsis)
 <!--The creation of this style guide was a collaborative effort from various raywenderlich.com team members under the direction of Nicholas Waynik.  The team includes: [Soheil Moayedi Azarpour](https://github.com/moayes), [Ricardo Rendon Cepeda](https://github.com/ricardo-rendoncepeda), [Tony Dahbura](https://github.com/tdahbura), [Colin Eberhardt](https://github.com/ColinEberhardt), [Matt Galloway](https://github.com/mattjgalloway), [Greg Heo](https://github.com/gregheo), [Matthijs Hollemans](https://github.com/hollance), [Christopher LaPollo](https://github.com/elephantronic), [Saul Mora](https://github.com/casademora), [Andy Pereira](https://github.com/macandyp), [Mic Pringle](https://github.com/micpringle), [Pietro Rea](https://github.com/pietrorea), [Cesare Rocchi](https://github.com/funkyboy), [Marin Todorov](https://github.com/icanzilb), [Nicholas Waynik](https://github.com/ndubbs), and [Ray Wenderlich](https://github.com/raywenderlich)-->
 
 This Guide is based on Raywenderlich's objective-c style guide. https://github.com/raywenderlich/objective-c-style-guide
@@ -36,6 +36,7 @@ Here are some of the documents from Apple that informed the style guide. If some
   * [Underscores](#underscores)
 * [Methods](#methods)
 * [Nullability](#nullability)
+  * [NSParameterAssert](#nsparameterassert)
 * [Variables](#variables)
 * [Property Attributes](#property-attributes)
 * [Dot-Notation Syntax](#dot-notation-syntax)
@@ -119,7 +120,7 @@ Use `#pragma mark -` to categorize methods in functional groupings and protocol/
 
 ## Spacing
 
-* Indent using 2 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
+* Indent using 4 spaces. Never indent with tabs. Be sure to set this preference in Xcode. (The rest of the document uses 2 spaces indentation, this conserves space in print and makes line wrapping less likely, in xcode we use the default 4 spaces.)
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
 
 **Preferred:**
@@ -284,7 +285,7 @@ AAPLListItem *matchingItem = [self.list itemWithName:nil];  // warning!
 ```
 
 
-#NSParameterAssert
+### NSParameterAssert
 
 Nonnull parameters always need to be checked up on arrival for nil-ness, using NSParameterAssert() function.
 
