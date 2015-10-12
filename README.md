@@ -13,7 +13,7 @@ This style guide contains suggestions proper code formatting, company convention
 Creator and maintener: [Oliver Kocsis](https://github.com/okocsis)
 <!--The creation of this style guide was a collaborative effort from various raywenderlich.com team members under the direction of Nicholas Waynik.  The team includes: [Soheil Moayedi Azarpour](https://github.com/moayes), [Ricardo Rendon Cepeda](https://github.com/ricardo-rendoncepeda), [Tony Dahbura](https://github.com/tdahbura), [Colin Eberhardt](https://github.com/ColinEberhardt), [Matt Galloway](https://github.com/mattjgalloway), [Greg Heo](https://github.com/gregheo), [Matthijs Hollemans](https://github.com/hollance), [Christopher LaPollo](https://github.com/elephantronic), [Saul Mora](https://github.com/casademora), [Andy Pereira](https://github.com/macandyp), [Mic Pringle](https://github.com/micpringle), [Pietro Rea](https://github.com/pietrorea), [Cesare Rocchi](https://github.com/funkyboy), [Marin Todorov](https://github.com/icanzilb), [Nicholas Waynik](https://github.com/ndubbs), and [Ray Wenderlich](https://github.com/raywenderlich)-->
 
-This Guide is based on Raywenderlich's 
+This Guide is based on Raywenderlich's objective-c style guide. https://github.com/raywenderlich/objective-c-style-guide
 
 ## Background
 
@@ -23,6 +23,8 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Cocoa Fundamentals Guide](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaFundamentals/Introduction/Introduction.html)
 * [Coding Guidelines for Cocoa](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html)
 * [iOS App Programming Guide](http://developer.apple.com/library/ios/#documentation/iphone/conceptual/iphoneosprogrammingguide/Introduction/Introduction.html)
+* [Using Swift with Cocoa and Objective-C](https://itunes.apple.com/us/book/using-swift-cocoa-objective/id1002624212?mt=11)
+* [Nullability and Objective-C](https://developer.apple.com/swift/blog/?id=25)
 
 ## Table of Contents
 
@@ -33,6 +35,7 @@ Here are some of the documents from Apple that informed the style guide. If some
 * [Naming](#naming)
   * [Underscores](#underscores)
 * [Methods](#methods)
+* [Nullability](#nullability)
 * [Variables](#variables)
 * [Property Attributes](#property-attributes)
 * [Dot-Notation Syntax](#dot-notation-syntax)
@@ -251,6 +254,62 @@ The usage of the word "and" is reserved.  It should not be used for multiple par
 - (id)taggedView:(NSInteger)tag;
 - (instancetype)initWithWidth:(CGFloat)width andHeight:(CGFloat)height;
 - (instancetype)initWith:(int)width and:(int)height;  // Never do this.
+```
+
+## Nullability
+
+For better interoperability with future swift code, one must use nullability qualifiers whereever possible. 
+The easyest way to achieve this is using the `NS_ASSUME_NONNULL_BEGIN`/`NS_ASSUME_NONNULL_END`, and wrap all header files to these macros. Then you only need to mark the nullable params and returns, because all the other will be assumed no to be nullable, and therefore the swift caller won't mishandle it to be an optional, when it is guarandied to be non null. For other info please read [apple documention](https://developer.apple.com/swift/blog/?id=25).
+
+**Preferred:**
+
+```objc
+NS_ASSUME_NONNULL_BEGIN
+@interface AAPLList : NSObject <NSCoding, NSCopying>
+// ...
+- (nullable AAPLListItem *)itemWithName:(NSString *)name;
+- (NSInteger)indexOfItem:(AAPLListItem *)item;
+
+@property (copy, nullable) NSString *name;
+@property (copy, readonly) NSArray *allItems;
+// ...
+@end
+NS_ASSUME_NONNULL_END
+
+// --------------
+
+self.list.name = nil;   // okay
+
+AAPLListItem *matchingItem = [self.list itemWithName:nil];  // warning!
+```
+
+
+#NSParameterAssert
+
+Nonnull parameters always need to be checked up on arrival for nil-ness, using NSParameterAssert() function.
+
+**Preferred:**
+
+.h:
+```objc
+NS_ASSUME_NONNULL_BEGIN
+@interface MyClass : NSObject
+- (void)someMethodWithNonNullParameter:(NSNumber *) param;
+
+  ...
+  }
+@end
+NS_ASSUME_NONNULL_END
+
+```
+
+.m:
+```objc
+- (void)someMethodWithNonNullParameter:(NSNumber *) param {
+  NSParameterAssert(param);
+
+  ...
+}
 ```
 
 ## Variables
